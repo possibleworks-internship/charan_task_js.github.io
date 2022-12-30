@@ -1,0 +1,22 @@
+.main{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.stylediv{
+    height: 50px;
+    width: 20%;
+}
+.main__row{
+    padding: 10px 0 10px 0;
+    margin-bottom: 3px;
+    border: 2px solid black;
+    display: flex;
+    justify-content: space-between;
+}
+.hidden {
+  display: none;
+}
+.add_color{
+  background-color: aquamarine;
+}
