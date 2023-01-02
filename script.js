@@ -37,7 +37,7 @@ const block = function (maindata, index = 0) {
             }'>DELETE</button>
             </div>
         <div>`;
-    context.insertAdjacentHTML("afterbegin", html);
+    context.insertAdjacentHTML("beforeend", html);
   });
   deleteButton();
   updatebutton();
@@ -91,8 +91,8 @@ const deleteButton = async function () {
   [...del_btn].forEach((ele) => {
     ele.addEventListener("click", function (e) {
       e.preventDefault();
-      let del = ele.className;
-      let del_sld = del.slice(8);
+      let del_class= ele.className;
+      let del_sld = del_class.slice(7);
       console.log(del_sld);
       let del_id = del_sld.match(/(\d+)/)[0];
       console.log(del_id);
@@ -104,7 +104,7 @@ const deleteButton = async function () {
         .then((data) => {
           let del = document.getElementById(`mainrow--${del_id - 1}`);
           console.log(del);
-          context.parentNode.removeChild(del);
+          context.removeChild(del);
         });
     });
   });
@@ -133,6 +133,7 @@ const updatebutton = async function () {
       add_button_save.addEventListener("click", function (e) {
         e.preventDefault();
         let add_new = add_input.value;
+        if (add_new === "") return;
         fetch(`https://jsonplaceholder.typicode.com/users/${upd_id}`, {
           method: "PATCH",
           body: JSON.stringify({
@@ -171,7 +172,6 @@ const main_search = function (data) {
       });
     });
 };
-
 
 const search = async function (data) {
   return main_search(data);
