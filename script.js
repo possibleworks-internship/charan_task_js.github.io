@@ -4,9 +4,9 @@ const context = document.querySelector(".main");
 
 //form inputs
 let name1 = document.querySelector("#name");
-let username = document.querySelector("#uname");
-let email = document.querySelector("#uemail");
-let number = document.querySelector("#pnumber");
+let username = document.querySelector("#username");
+let email = document.querySelector("#email");
+let number = document.querySelector("#phone");
 const submit = document.querySelector(".submit");
 
 //creating a block
@@ -33,7 +33,7 @@ const block = function (maindata, index = 0) {
             </div>
             <div class="stylediv">
             <button class='delete delete-${
-              index ? index : i + 1
+              index ? index : i
             }'>DELETE</button>
             </div>
         <div>`;
@@ -53,9 +53,15 @@ const fetchData = async function () {
   let maindata = arr.flat(1);
   console.log(maindata);
   block(maindata);
-  search(maindata);
 };
-fetchData();
+if (window.localStorage.getItem("usersdata")) {
+  arr = JSON.parse(window.localStorage.getItem("usersdata"));
+  block(arr);
+} else {
+  fetchData();
+}
+
+// fetchData();
 
 //adding new data
 const formdata = document.querySelector("#formdata");
@@ -82,37 +88,43 @@ formdata.addEventListener("submit", function (e) {
       let [newone] = arr.slice(-1);
       block([newone], i);
     });
+  name1.value = username.value = email.value = number.value = "";
 });
 
 //deleting the data
 
-const deleteButton = async function () {
-  var del_btn = await document.getElementsByClassName("delete");
+function deleteButton() {
+  var del_btn = document.getElementsByClassName("delete");
   [...del_btn].forEach((ele) => {
     ele.addEventListener("click", function (e) {
       e.preventDefault();
-      let del_class= ele.className;
+      let del_class = ele.className;
       let del_sld = del_class.slice(7);
       console.log(del_sld);
       let del_id = del_sld.match(/(\d+)/)[0];
       console.log(del_id);
-
-      fetch(`https://jsonplaceholder.typicode.com/users/${del_id}`, {
-        method: "DELETE",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          let del = document.getElementById(`mainrow--${del_id - 1}`);
-          console.log(del);
-          context.removeChild(del);
-        });
+      if (confirm("Want to delete?")) {
+        fetch(`https://jsonplaceholder.typicode.com/users/${del_id}`, {
+          method: "DELETE",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            let del = document.getElementById(`mainrow--${del_id}`);
+            console.log(del);
+            context.removeChild(del);
+            arr = JSON.parse(window.localStorage.getItem("usersdata"));
+            arr.splice(del_id, 1);
+            console.log(del_id-1);
+            window.localStorage.setItem("usersdata", JSON.stringify(arr));
+          });
+      }
     });
   });
-};
+}
 
 //updating data
-const updatebutton = async function () {
-  var update_btn = await document.getElementsByClassName("update");
+function updatebutton() {
+  var update_btn = document.getElementsByClassName("update");
   [...update_btn].forEach((ele) => {
     ele.addEventListener("click", function (e) {
       let upd = ele.className;
@@ -150,29 +162,40 @@ const updatebutton = async function () {
             ele.classList.remove("hidden");
             add_button_save.classList.add("hidden");
             add_input.classList.add("hidden");
+            arr = JSON.parse(window.localStorage.getItem("usersdata"));
+            arr[upd_id].name = data.name;
+            window.localStorage.setItem("usersdata", JSON.stringify(arr));
           });
       });
     });
   });
-};
+}
 
 //searching for data
-const main_search = function (data) {
-  document
-    .querySelector(".search_button")
-    .addEventListener("click", function (e) {
-      e.preventDefault();
-      let search_data = document.querySelector(".search").value;
-      let value = data.filter((el) => el.name.includes(search_data));
-      value.forEach((ele) => {
-        let index = ele.id;
-        document
-          .getElementById(`mainrow--${index - 1}`)
-          .classList.add("add_color");
-      });
-    });
-};
-
-const search = async function (data) {
-  return main_search(data);
-};
+let c=0;
+var value;
+const remove=function(arr){
+  arr.forEach((_, i) => {
+    let cls = document.getElementById(`mainrow--${i}`);
+    context.removeChild(cls);
+  });
+}
+document
+  .querySelector(".search_button")
+  .addEventListener("click", function (e) {
+    e.preventDefault();
+    let search_data = document.querySelector(".search").value.toLowerCase();
+    console.log(search_data);
+    if (search_data === "") {
+      block(arr);
+    }
+    if(c==0){
+      remove(arr)
+      c+=1
+    }
+    else{
+      remove(value)
+    }
+    value = arr.filter((el) => el.name.toLowerCase().includes(search_data));
+    block(value);
+  });
