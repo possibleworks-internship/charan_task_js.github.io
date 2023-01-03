@@ -187,7 +187,7 @@ document
     let search_data = document.querySelector(".search").value.toLowerCase();
     console.log(search_data);
     if (search_data === "") {
-      block(arr);
+      alert("No data found or please enter valid data")
     }
     if(c==0){
       remove(arr)
